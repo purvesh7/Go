@@ -50,20 +50,23 @@ func GetTodoByID(ctx *fiber.Ctx) {
 
 // CreateTodo - POST /api/todos
 func CreateTodo(ctx *fiber.Ctx) {
-    params := new(struct{
-        Title string
+    params := new(struct {
+        Title       string
         Description string
     })
-    ctx.Bodyparser(&params)
+
+    ctx.BodyParser(&params)
+
     if len(params.Title) == 0 || len(params.Description) == 0 {
         ctx.Status(400).JSON(fiber.Map{
-            "ok": false,
-            "error" : "Title or description not specified.",
+            "ok":    false,
+            "error": "Title or description not specified.",
         })
         return
     }
+
     todo := models.CreateTodo(params.Title, params.Description)
-    err := mgm.Coll.Create(todo)
+    err := mgm.Coll(todo).Create(todo)
     if err != nil {
         ctx.Status(500).JSON(fiber.Map{
             "ok":    false,
@@ -76,7 +79,6 @@ func CreateTodo(ctx *fiber.Ctx) {
         "ok":   true,
         "todo": todo,
     })
-
 }
 
 // ToggleTodoStatus - PATCH /api/todos/:id
